@@ -1,0 +1,28 @@
+.page{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.body{flex:1;overflow-y:auto;padding:22px}
+.sel{border:1px solid var(--bd2);background:var(--sf);border-radius:20px;padding:5px 11px;font-size:12px;color:var(--i2);font-family:inherit;outline:none;cursor:pointer}
+.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:16px}
+.kcard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:14px 16px}
+.kl{font-size:10px;color:var(--i3);letter-spacing:.07em;margin-bottom:6px}
+.kv{font-size:22px;font-weight:300;color:var(--ink)}
+.kd{font-size:11px;margin-top:4px}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chartCard{background:var(--sf);border:1px solid var(--bd);border-radius:var(--rl);padding:16px}
+.chartTitle{font-size:12px;color:var(--ink);font-weight:500;margin-bottom:12px}
+.donutRow{display:flex;align-items:center;gap:14px}
+.legend{flex:1;display:flex;flex-direction:column;gap:8px}
+.legRow{display:flex;align-items:center;gap:7px;font-size:12px}
+.legDot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.legName{color:var(--i2);flex:1}
+.legVal{color:var(--ink);font-weight:400}
+
+/* RWD */
+@media (max-width:768px){
+  .page{padding-bottom:60px}
+  .krow{grid-template-columns:repeat(2,1fr)}
+  .charts{grid-template-columns:1fr}
+  .kv{font-size:18px}
+}
+@media (max-width:480px){
+  .krow{grid-template-columns:repeat(2,1fr);gap:6px}
+}

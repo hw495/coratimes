@@ -1,0 +1,35 @@
+.page{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.body{flex:1;overflow-y:auto;padding:22px}
+.sel{border:1px solid var(--bd2);background:var(--sf);border-radius:20px;padding:5px 11px;font-size:12px;color:var(--i2);font-family:inherit;outline:none;cursor:pointer}
+.weekChip{font-size:12px;color:var(--ink);font-weight:300;min-width:110px;text-align:center}
+.calWrap{border:1px solid var(--bd);border-radius:var(--rl);overflow:hidden}
+.weekHeader{display:grid;grid-template-columns:repeat(7,1fr)}
+.dayHead{padding:9px 6px;text-align:center;border-bottom:1px solid var(--bd);background:var(--sb);border-right:1px solid var(--bd)}
+.dayHead:last-child{border-right:none}
+.dw{font-size:9px;color:var(--i3);letter-spacing:.05em}
+.dn{font-size:16px;font-weight:300;color:var(--ink)}
+.today .dn{color:var(--rose);font-weight:400}
+.weekBody{display:grid;grid-template-columns:repeat(7,1fr)}
+.dayCol{border-right:1px solid var(--bd);min-height:340px;padding:5px 4px;background:var(--sf)}
+.dayCol:last-child{border-right:none}
+.todayCol{background:#FFFCFA}
+.sc{border-radius:8px;padding:6px 7px;margin-bottom:4px;cursor:pointer;border-left:2.5px solid transparent;transition:opacity .12s}
+.sc:hover{opacity:.82}
+.scTime{font-size:9px;color:var(--i3)}
+.scName{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scMeta{font-size:9px;color:var(--i3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend{display:flex;gap:14px;padding:9px 14px;border-top:1px solid var(--bd);background:var(--sb);flex-wrap:wrap}
+.legItem{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--i3)}
+.legDot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* RWD */
+@media (max-width:1024px){
+  .weekHeader,.weekBody{grid-template-columns:repeat(7,minmax(80px,1fr))}
+  .calWrap{overflow-x:auto}
+}
+@media (max-width:768px){
+  .page{padding-bottom:60px}
+  .weekChip{min-width:auto;font-size:11px}
+  .weekHeader,.weekBody{grid-template-columns:repeat(7,minmax(70px,1fr));min-width:490px}
+  .scName{font-size:10px}
+}

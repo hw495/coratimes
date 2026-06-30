@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAF8F5;--sb:#F0EBE3;--sf:#FFFFFF;--sand2:#E8E0D6;--sand3:#D6CCC0;
+  --rose:#C4957A;--rs:#F5ECE6;--rm:#A87A62;
+  --sage:#7A9E8E;--ss:#EAF2EF;--sm:#5C7D6F;
+  --ink:#3A3530;--i2:#6E6358;--i3:#A89E94;
+  --bd:#EAE4DC;--bd2:#D6CCC0;
+  --r:10px;--rl:16px;
+  --amb:#B8924A;--ambs:#F5EDD8;
+  --lav:#9B8FAE;--lavs:#F0EDF5;
+  --mist:#8A9BAE;--mists:#EEF2F6;
+  --coral:#C4726A;--corals:#F9EDEC;
+}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.6}
+a{text-decoration:none;color:inherit}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+
+/* ── RWD Global ────────────────────────────────────────── */
+:root {
+  --nav-height: 36px;
+  --sidebar-w: 214px;
+  --bottom-nav-h: 60px;
+}
+* { box-sizing: border-box; }
+
+/* scrollbar thin */
+::-webkit-scrollbar { width:5px; height:5px }
+::-webkit-scrollbar-track { background:transparent }
+::-webkit-scrollbar-thumb { background:var(--sand3); border-radius:3px }
+
+/* utility classes */
+.hide-mobile  { display:block }
+.show-mobile  { display:none  }
+.hide-tablet  { display:block }
+
+@media (max-width: 768px) {
+  .hide-mobile  { display:none  !important }
+  .show-mobile  { display:block !important }
+}
+@media (max-width: 1024px) {
+  .hide-tablet  { display:none  !important }
+}
+
+/* ── Login page RWD ─────────────────────────────── */
+@media (max-width: 768px) {
+  /* hide left illustration panels on mobile */
+  [class*="loginLeft"],
+  [style*="width:\"45%\""],
+  [style*='width:"44%"'] {
+    display: none !important;
+  }
+}
+
+/* ── Design pages content padding ───────────────── */
+@media (max-width: 768px) {
+  /* extra bottom padding for mobile bottom nav */
+  .page, [class*="page"] {
+    padding-bottom: 72px !important;
+  }
+}
+
+/* ── Topbar RWD ──────────────────────────────────── */
+@media (max-width: 768px) {
+  [class*="topbar"] {
+    padding: 0 12px !important;
+    gap: 6px !important;
+  }
+  [class*="topbar"] [class*="sep"] {
+    display: none !important;
+  }
+}
+
+/* ── Tables → card layout on mobile ─────────────── */
+@media (max-width: 640px) {
+  [class*="tableWrap"] [class*="tHead"] {
+    display: none !important;
+  }
+}
