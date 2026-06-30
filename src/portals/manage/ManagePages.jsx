@@ -806,6 +806,7 @@ export function Coaches() {
     { id:2, name:"Annie", initial:"A", bg:T.mists, color:T.mist, photo:null, studios:["S.T Pilates"], phone:"0933-000-002", email:"annie@stpilates.com", instagram:"", bio:"結合瑜珈與皮拉提斯，幫助學員找回身體的自然平衡。", skills:["墊上","瑜珈"], title:"瑜珈暨皮拉提斯教練", exp:"5年", sessions:18, members:5,  visible:false, salary:{ type:"per_session", amount:700 } },
   ]);
   const [selectedId, setSelectedId] = useState(null);
+  const [view, setView] = useState("cards"); // cards | list
   const [coachSearch, setCoachSearch] = useState("");
   const [coachFilters, setCoachFilters] = useState({ status:"all", studio:"all" });
   const setCoachF = (k,v) => setCoachFilters(p=>({...p,[k]:v}));
@@ -858,6 +859,12 @@ export function Coaches() {
   return (
     <Page>
       <Topbar title="教練">
+        <div style={{ display:"flex",gap:3,background:T.sb,borderRadius:20,padding:3 }}>
+          {[["cards","卡片"],["list","列表"]].map(([v,l])=>(
+            <button key={v} onClick={()=>setView(v)}
+              style={{ padding:"4px 12px",borderRadius:18,fontSize:12,color:view===v?T.ink:T.i3,background:view===v?T.sf:"none",border:"none",cursor:"pointer",fontFamily:"inherit" }}>{l}</button>
+          ))}
+        </div>
         <Btn variant="primary" onClick={()=>setAddModal(true)}>＋ 新增教練</Btn>
       </Topbar>
       <Body>
@@ -870,9 +877,10 @@ export function Coaches() {
           values={coachFilters} onChange={setCoachF} onReset={resetCoachF}
           resultCount={filteredCoaches.length}
         />
-        <div style={{ display:"grid", gridTemplateColumns: selectedCoach ? "1fr 320px" : "repeat(auto-fill,minmax(220px,1fr))", gap:14, alignItems:"start" }}>
+        <div style={{ display:"grid", gridTemplateColumns: selectedCoach ? "1fr 320px" : "1fr", gap:14, alignItems:"start" }}>
 
           {/* 教練卡片區 */}
+          {view==="cards" && (
           <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:12, alignContent:"start" }}>
             {filteredCoaches.map(c=>(
               <Card key={c.id} style={{ padding:"18px", cursor:"pointer", border:`1.5px solid ${selectedId===c.id?c.color:T.bd}`, transition:"border-color .15s" }}
@@ -934,6 +942,65 @@ export function Coaches() {
               <span style={{ fontSize:22 }}>＋</span>新增教練
             </div>
           </div>
+          )}
+
+          {/* 教練列表區 */}
+          {view==="list" && (
+          <Card>
+            <div style={{ display:"grid",gridTemplateColumns:"44px 1.4fr 96px 70px 60px 1fr 232px",background:T.sb,borderBottom:`1px solid ${T.bd}` }}>
+              {["","教練","狀態","本月場次","學員數","教學專長",""].map((h,i)=>(
+                <div key={i} style={{ padding:"9px 10px",fontSize:10,color:T.i3,fontWeight:500,letterSpacing:".05em" }}>{h}</div>
+              ))}
+            </div>
+            {filteredCoaches.length===0 ? (
+              <div style={{ padding:"40px",textAlign:"center",color:T.i3,fontSize:13 }}>沒有符合條件的教練</div>
+            ) : filteredCoaches.map((c,i)=>(
+              <div key={c.id}
+                style={{ display:"grid",gridTemplateColumns:"44px 1.4fr 96px 70px 60px 1fr 232px",
+                         borderBottom:i<filteredCoaches.length-1?`1px solid ${T.bd}`:"none",
+                         background:selectedId===c.id?T.rs:i%2===0?T.sf:T.bg,alignItems:"center",
+                         cursor:"pointer",transition:"background .1s" }}
+                onClick={()=>setSelectedId(selectedId===c.id?null:c.id)}>
+                {/* 頭像 */}
+                <div style={{ padding:"10px 8px" }}>
+                  <div style={{ width:30,height:30,borderRadius:"50%",background:c.bg,color:c.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:300,overflow:"hidden",flexShrink:0 }}>
+                    {c.photo
+                      ? <img src={c.photo} alt="" style={{ width:"100%",height:"100%",objectFit:"cover" }} />
+                      : c.initial}
+                  </div>
+                </div>
+                {/* 名稱 + 職稱 */}
+                <div style={{ padding:"10px 10px",minWidth:0 }}>
+                  <div style={{ fontSize:13,color:T.ink,fontWeight:500 }}>{c.name}</div>
+                  <div style={{ fontSize:10,color:T.i3,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{c.title||"教練"}</div>
+                </div>
+                {/* 狀態 */}
+                <div style={{ padding:"10px 10px",display:"flex",alignItems:"center",gap:6 }}>
+                  <Tag bg={c.visible?T.ss:T.sb} color={c.visible?T.sm:T.i3}>{c.visible?"顯示中":"隱藏"}</Tag>
+                  <button onClick={e=>toggleVisible(c.id,e)}
+                    style={{ fontSize:10,color:c.visible?T.coral:T.sm,background:"none",border:"none",cursor:"pointer",fontFamily:"inherit" }}>
+                    {c.visible?"隱藏":"顯示"}
+                  </button>
+                </div>
+                {/* 本月場次 */}
+                <div style={{ padding:"10px 10px",fontSize:13,color:T.i2 }}>{c.sessions}</div>
+                {/* 學員數 */}
+                <div style={{ padding:"10px 10px",fontSize:13,color:T.i2 }}>{c.members}</div>
+                {/* 教學專長 */}
+                <div style={{ padding:"10px 10px",display:"flex",gap:4,flexWrap:"wrap" }}>
+                  {c.skills.slice(0,3).map(sk=><span key={sk} style={{ fontSize:10,padding:"2px 8px",borderRadius:10,background:T.sb,color:T.i2 }}>{sk}</span>)}
+                </div>
+                {/* 操作 */}
+                <div style={{ padding:"8px 8px",display:"flex",gap:5,flexWrap:"wrap" }}>
+                  <Btn sm onClick={e=>{ e.stopPropagation(); setRecordModal(c); }}>薪資紀錄</Btn>
+                  <Btn sm onClick={e=>{ e.stopPropagation(); setSalaryModal(c); }}>計薪設定</Btn>
+                  <Btn sm onClick={e=>{ e.stopPropagation(); setSelectedId(c.id); setEditModal(true); }}>編輯</Btn>
+                  <Btn sm variant="danger" onClick={e=>{ e.stopPropagation(); setSelectedId(c.id); setDeleteModal(true); }}>移除</Btn>
+                </div>
+              </div>
+            ))}
+          </Card>
+          )}
 
           {/* 右側詳情 */}
           {selectedCoach && (
