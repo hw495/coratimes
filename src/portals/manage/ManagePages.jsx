@@ -1463,6 +1463,8 @@ export function Settings() {
   const [line, setLine] = useState({ connected:false, channel_id:"", channel_secret:"" });
   const [health, setHealth] = useState({ required:true, requireEveryYear:false, reminderDays:1, blockBooking:false });
   const hf = (k,v) => setHealth(p=>({...p,[k]:v}));
+  const [rolePerms, setRolePerms] = useState(ROLE_PERM_DEFAULT);
+  const setRolePerm = (role, mod, val) => setRolePerms(p=>({...p,[role]:{...p[role],[mod]:val}}));
 
   const Toggle = ({ checked, onChange }) => (
     <button onClick={()=>onChange(!checked)} style={{ width:36,height:20,borderRadius:10,border:"none",cursor:"pointer",background:checked?T.sage:T.sand3,position:"relative",transition:"background .2s",flexShrink:0 }}>
@@ -1496,6 +1498,7 @@ export function Settings() {
     { id:"notify",  icon:"🔔", label:"通知設定"  },
     { id:"line",    icon:"💬", label:"LINE 整合" },
     { id:"health",  icon:"📋", label:"健康評估"  },
+    { id:"roles",   icon:"🛡", label:"角色權限"  },
   ];
 
   const handleSave = () => { setSaved(true); setTimeout(()=>setSaved(false),2000); };
@@ -1525,6 +1528,14 @@ export function Settings() {
 
   const Content = () => (
     <>
+      {section === "roles" && (
+        <>
+          <div style={{ fontSize:13,fontWeight:500,color:T.ink,marginBottom:4 }}>角色預設權限</div>
+          <div style={{ fontSize:11,color:T.i3,marginBottom:14 }}>僅公司管理員可調整。設定各角色加入時套用的預設權限。</div>
+          <RolePermTable rolePerms={rolePerms} setRolePerm={setRolePerm} onReset={()=>setRolePerms(ROLE_PERM_DEFAULT)} />
+        </>
+      )}
+
       {section === "venue" && (
         <>
           <div style={{ fontSize:13,fontWeight:500,color:T.ink,marginBottom:16 }}>場館資訊</div>
@@ -1904,9 +1915,6 @@ function RolePermTable({ rolePerms, setRolePerm, onReset }) {
 
 export function Team() {
   const [selected, setSelected] = useState("Eddie");
-  const [tab, setTab] = useState("members");
-  const [rolePerms, setRolePerms] = useState(ROLE_PERM_DEFAULT);
-  const setRolePerm = (role, mod, val) => setRolePerms(p=>({...p,[role]:{...p[role],[mod]:val}}));
   const [inviteModal, setInviteModal] = useState(false);
   const [inviteForm, setInviteForm] = useState({ name:"", email:"", role:"staff" });
   const ivf = (k,v) => setInviteForm(p=>({...p,[k]:v}));
@@ -1927,16 +1935,9 @@ export function Team() {
   return (
     <Page>
       <Topbar title="成員管理">
-        <div style={{ display:"flex",gap:3,background:T.sb,borderRadius:20,padding:3 }}>
-          {[["members","成員"],["roles","角色權限"]].map(([v,l])=>(
-            <button key={v} onClick={()=>setTab(v)}
-              style={{ padding:"4px 14px",borderRadius:18,fontSize:12,color:tab===v?T.ink:T.i3,background:tab===v?T.sf:"none",border:"none",cursor:"pointer",fontFamily:"inherit" }}>{l}</button>
-          ))}
-        </div>
-        {tab==="members" && <Btn variant="primary" onClick={()=>setInviteModal(true)}>＋ 邀請成員</Btn>}
+        <Btn variant="primary" onClick={()=>setInviteModal(true)}>＋ 邀請成員</Btn>
       </Topbar>
       <Body>
-        {tab==="members" && (
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:14 }}>
           <div>
             <Card>
@@ -1989,11 +1990,6 @@ export function Team() {
             </div>
           </Card>
         </div>
-        )}
-
-        {tab==="roles" && (
-          <RolePermTable rolePerms={rolePerms} setRolePerm={setRolePerm} onReset={()=>setRolePerms(ROLE_PERM_DEFAULT)} />
-        )}
 
         {/* 邀請成員 Modal */}
         {inviteModal && (
