@@ -1816,10 +1816,99 @@ export function Contracts() {
 }
 
 // ── 成員管理 ─────────────────────────────────────────────────
+const PERM_MODULES = [
+  { group:"營運", items:[
+    ["checkin","今日簽到"],["calendar","時光表"],["schedule","排班"],
+    ["courses","課程庫"],["plans","方案"],["members","學員"],
+    ["coaches","教練"],["posture","體態評估"],
+  ]},
+  { group:"財務與分析", items:[
+    ["payments","收款確認"],["insights","洞察"],
+  ]},
+  { group:"設定", items:[
+    ["settings","偏好設定"],["contracts","服務合約"],["team","成員管理"],
+  ]},
+];
+const PERM_LEVELS = [
+  { v:"full", l:"全權", bg:"#E7F0E9", color:"#5B8A6F" },
+  { v:"edit", l:"編輯", bg:"#EAF0F6", color:"#5B7B9A" },
+  { v:"view", l:"檢視", bg:"#F4EFE7", color:"#9A865F" },
+  { v:"none", l:"無",   bg:"#F2EDE9", color:"#B0A89E" },
+];
+const PERM_ROLES = [
+  { v:"venue_manager", l:"場館管理員", scope:"限所屬場館" },
+  { v:"coach",         l:"教練",       scope:"限本人相關" },
+  { v:"staff",         l:"行政助理",   scope:"全場館" },
+];
+const ROLE_PERM_DEFAULT = {
+  venue_manager:{ checkin:"full", calendar:"full", schedule:"full", courses:"full", plans:"edit", members:"full", coaches:"edit", posture:"full", payments:"full", insights:"full", settings:"none", contracts:"view", team:"full" },
+  coach:        { checkin:"edit", calendar:"view", schedule:"view", courses:"view", plans:"none", members:"view", coaches:"view", posture:"edit", payments:"none", insights:"view", settings:"none", contracts:"none", team:"none" },
+  staff:        { checkin:"full", calendar:"edit", schedule:"edit", courses:"view", plans:"edit", members:"full", coaches:"view", posture:"view", payments:"none", insights:"none", settings:"none", contracts:"view", team:"none" },
+};
+
+function RolePermTable({ rolePerms, setRolePerm, onReset }) {
+  const cell = (role, mod) => {
+    const val = rolePerms[role][mod];
+    const lv = PERM_LEVELS.find(x=>x.v===val) || PERM_LEVELS[3];
+    return (
+      <select value={val} onChange={e=>setRolePerm(role,mod,e.target.value)}
+        style={{ width:"100%",border:`1px solid ${T.bd2}`,borderRadius:8,padding:"5px 8px",
+                 fontSize:12,fontWeight:500,color:lv.color,background:lv.bg,fontFamily:"inherit",outline:"none",cursor:"pointer" }}>
+        {PERM_LEVELS.map(op=><option key={op.v} value={op.v} style={{ color:"#3A3530",background:"#fff" }}>{op.l}</option>)}
+      </select>
+    );
+  };
+  const colGrid = "1.4fr 1fr 1fr 1fr";
+  return (
+    <Card style={{ padding:0,overflow:"hidden" }}>
+      <div style={{ padding:"14px 16px",borderBottom:`1px solid ${T.bd}`,background:T.sf }}>
+        <div style={{ fontSize:13,fontWeight:500,color:T.ink,marginBottom:4 }}>角色預設權限</div>
+        <div style={{ fontSize:11,color:T.i3,lineHeight:1.7 }}>
+          設定各角色的預設權限，新成員加入時自動套用。場館管理員的權限自動限縮於所屬場館，教練則限於本人相關的課程與學員。
+          <strong style={{ color:T.i2 }}> 薪資資料僅公司管理員可見，不受此表影響。</strong>
+        </div>
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:colGrid,background:T.sb,borderBottom:`1px solid ${T.bd}`,alignItems:"center" }}>
+        <div style={{ padding:"10px 12px",fontSize:11,fontWeight:600,color:T.ink }}>模組</div>
+        {PERM_ROLES.map(r=>(
+          <div key={r.v} style={{ padding:"8px 12px" }}>
+            <div style={{ fontSize:12,fontWeight:600,color:T.ink }}>{r.l}</div>
+            <div style={{ fontSize:9,color:T.i3,marginTop:1 }}>{r.scope}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:"1.4fr 3fr",background:T.lavs,borderBottom:`1px solid ${T.bd}`,alignItems:"center" }}>
+        <div style={{ padding:"8px 12px",fontSize:12,fontWeight:500,color:T.lav }}>公司管理員</div>
+        <div style={{ padding:"8px 12px",fontSize:11,color:T.i2 }}>全功能 · 全場館（固定，不可調整）</div>
+      </div>
+      {PERM_MODULES.map(g=>(
+        <div key={g.group}>
+          <div style={{ padding:"7px 12px",fontSize:10,color:T.i3,letterSpacing:".08em",background:T.sf,borderBottom:`1px solid ${T.bd}` }}>{g.group}</div>
+          {g.items.map(([mod,label])=>(
+            <div key={mod} style={{ display:"grid",gridTemplateColumns:colGrid,borderBottom:`1px solid ${T.bd}`,alignItems:"center" }}>
+              <div style={{ padding:"8px 12px",fontSize:12,color:T.ink }}>{label}</div>
+              {PERM_ROLES.map(r=>(
+                <div key={r.v} style={{ padding:"6px 10px" }}>{cell(r.v,mod)}</div>
+              ))}
+            </div>
+          ))}
+        </div>
+      ))}
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",background:T.sf }}>
+        <button onClick={onReset} style={{ fontSize:11,color:T.rose,background:"none",border:"none",cursor:"pointer",fontFamily:"inherit" }}>↺ 還原預設</button>
+        <Btn variant="primary">儲存設定</Btn>
+      </div>
+    </Card>
+  );
+}
+
 export function Team() {
   const [selected, setSelected] = useState("Eddie");
+  const [tab, setTab] = useState("members");
+  const [rolePerms, setRolePerms] = useState(ROLE_PERM_DEFAULT);
+  const setRolePerm = (role, mod, val) => setRolePerms(p=>({...p,[role]:{...p[role],[mod]:val}}));
   const [inviteModal, setInviteModal] = useState(false);
-  const [inviteForm, setInviteForm] = useState({ name:"", email:"", role:"coach" });
+  const [inviteForm, setInviteForm] = useState({ name:"", email:"", role:"staff" });
   const ivf = (k,v) => setInviteForm(p=>({...p,[k]:v}));
   const members = [
     { name:"Eddie",  role:"company_admin", roleLabel:"創辦人",   bg:T.lavs, color:T.lav  },
@@ -1838,9 +1927,16 @@ export function Team() {
   return (
     <Page>
       <Topbar title="成員管理">
-        <Btn variant="primary" onClick={()=>setInviteModal(true)}>＋ 邀請成員</Btn>
+        <div style={{ display:"flex",gap:3,background:T.sb,borderRadius:20,padding:3 }}>
+          {[["members","成員"],["roles","角色權限"]].map(([v,l])=>(
+            <button key={v} onClick={()=>setTab(v)}
+              style={{ padding:"4px 14px",borderRadius:18,fontSize:12,color:tab===v?T.ink:T.i3,background:tab===v?T.sf:"none",border:"none",cursor:"pointer",fontFamily:"inherit" }}>{l}</button>
+          ))}
+        </div>
+        {tab==="members" && <Btn variant="primary" onClick={()=>setInviteModal(true)}>＋ 邀請成員</Btn>}
       </Topbar>
       <Body>
+        {tab==="members" && (
         <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:14 }}>
           <div>
             <Card>
@@ -1893,6 +1989,11 @@ export function Team() {
             </div>
           </Card>
         </div>
+        )}
+
+        {tab==="roles" && (
+          <RolePermTable rolePerms={rolePerms} setRolePerm={setRolePerm} onReset={()=>setRolePerms(ROLE_PERM_DEFAULT)} />
+        )}
 
         {/* 邀請成員 Modal */}
         {inviteModal && (
@@ -1911,17 +2012,17 @@ export function Team() {
               <div style={{ marginBottom:16 }}>
                 <div style={{ fontSize:10,color:T.i3,letterSpacing:".06em",marginBottom:8 }}>角色</div>
                 <div style={{ display:"flex",gap:8,flexWrap:"wrap" }}>
-                  {[["company_admin","Company Admin"],["venue_manager","場館管理員"],["coach","教練"],["staff","行政助理"]].map(([v,l])=>(
+                  {[["company_admin","公司管理員"],["venue_manager","場館管理員"],["staff","行政助理"]].map(([v,l])=>(
                     <button key={v} onClick={()=>ivf("role",v)} style={{ padding:"5px 12px",borderRadius:20,border:`1px solid ${inviteForm.role===v?T.rose:T.bd2}`,background:inviteForm.role===v?T.rs:"none",color:inviteForm.role===v?T.rm:T.i3,fontSize:11,cursor:"pointer",fontFamily:"inherit" }}>{l}</button>
                   ))}
                 </div>
               </div>
               <div style={{ padding:"10px 13px",background:T.sb,borderRadius:9,fontSize:11,color:T.i3,marginBottom:14,lineHeight:1.6 }}>
-                ✉ 系統將發送邀請連結至對方 Email，點擊後即可設定密碼並加入場館。
+                ✉ 系統將發送邀請連結至對方 Email，點擊後即可設定密碼並加入場館。教練請於「教練」頁新增。
               </div>
               <div style={{ display:"flex",justifyContent:"flex-end",gap:8,paddingTop:14,borderTop:`1px solid ${T.bd}` }}>
                 <Btn onClick={()=>setInviteModal(false)}>取消</Btn>
-                <Btn variant="primary" onClick={()=>{ if(inviteForm.name&&inviteForm.email){ setInviteModal(false); setInviteForm({ name:"",email:"",role:"coach" }); } }}>發送邀請</Btn>
+                <Btn variant="primary" onClick={()=>{ if(inviteForm.name&&inviteForm.email){ setInviteModal(false); setInviteForm({ name:"",email:"",role:"staff" }); } }}>發送邀請</Btn>
               </div>
             </div>
           </div>
